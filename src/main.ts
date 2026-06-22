@@ -13,6 +13,7 @@ async function bootstrap() {
   app.enableCors();
   await app.listen(3000);
 
+  // Swagger
   const options = new DocumentBuilder()
     .setTitle('API')
     .setDescription('The API description')
