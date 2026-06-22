@@ -6,12 +6,12 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UserService,
+    private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
   async login(email: string, senha: string) {
-    const usuario = await this.usersService.findByEmail(email);
+    const usuario = await this.userService.findByEmail(email);
     if (!usuario) {
       throw new Error('Usuário não encontrado');
     }
