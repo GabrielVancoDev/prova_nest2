@@ -1,33 +1,49 @@
-// Implemente um código onde tinha os métodos de Login, criação e Consulta de Usuários.
-// Ele deve conter o método de autenticação
-// deverá realizar a liberação do CORS
-// Deverá ter a documentação de todos os end-points existentes no sistema
-// Deverá ser implementado através de serviços
-
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    // Criação de Usuário
-    return `Usuário Criado com Sucesso`;
+  constructor(
+    private readonly userModel: any,
+  ) {}
+
+  async create(data: CreateUserDto) {
+    const existe = await this.userModel.findOne({
+      email: data.email,
+    });
+
+    if (existe) {
+      throw new BadRequestException('Email já cadastrado');
+    }
+
+    const senhaHash = await bcrypt.hash(data.senha, 10);
+
+    return this.userModel.create({
+      ...data,
+      senha: senhaHash,
+    });
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.userModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    return this.userModel.findById(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, data: UpdateUserDto) {
+    return this.userModel.findByIdAndUpdate(id, data, { new: true });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    return this.userModel.findByIdAndDelete(id);
+  }
+
+  findByEmail(email: string) {
+    return this.userModel.findOne({ email });
   }
 }
